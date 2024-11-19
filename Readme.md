@@ -1,4 +1,4 @@
-# Brain Extraction Pipeline with HDBET (Docker and Signgularity)
+# Defacing with HDBET (Docker and Singularity)
 
 This project provides a simple docker/singularity pipeline for **defacing** from NIfTI MRI (`.nii.gz`) files using skull-stripping **HD-BET** and then dilation. 
 
