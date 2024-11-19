@@ -1,0 +1,64 @@
+Bootstrap: docker
+From: pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
+
+%labels
+    Author YourName
+    Version v1.0
+    Description Singularity container for Defacer with necessary dependencies.
+
+%post
+    # Set environment variables for non-interactive installation
+    export DEBIAN_FRONTEND=noninteractive
+
+    # Update package lists and install tzdata
+    apt-get update && apt-get install -y tzdata
+
+    # Set the timezone to US/Eastern
+    ln -snf /usr/share/zoneinfo/US/Eastern /etc/localtime && echo "US/Eastern" > /etc/timezone
+
+    # Install OpenCV dependencies
+    apt-get update && apt-get install -y ffmpeg libsm6 libxext6
+
+    # Install Python 3.8 and related packages
+    apt-get update && \
+        apt-get install --no-install-recommends -y build-essential software-properties-common && \
+        add-apt-repository -y ppa:deadsnakes/ppa && \
+        apt-get update && \
+        apt-get install --no-install-recommends -y python3.8 python3-pip python3-setuptools python3-distutils wget && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*
+
+    # Upgrade pip for Python 3.8
+    python3.8 -m pip install --upgrade pip
+
+    # Create a symbolic link for python3 to point to python3.8
+    ln -sf /usr/bin/python3.8 /usr/bin/python3
+
+    # Upgrade pip for the default python3 (now pointing to python3.8)
+    python3 -m pip install --upgrade pip
+
+    # Install Python packages
+    pip install statsmodels==0.12.1 torchaudio==0.10.0 torchvision==0.11.1
+    pip install SimpleITK itk-elastix imageio matplotlib opencv-python pandas scikit-image scikit-learn scipy nibabel
+
+    # Install HDBET dependencies if any (assuming HDBET has its own requirements)
+    # If HDBET requires installation, include commands here. Currently, just copying the directory.
+
+    # Create necessary directories
+    mkdir -p /temp /output
+
+%files
+    # Copy the HDBET directory into /HDBET/ in the container
+    HDBET/ /HDBET/
+
+    # Copy the defacer.py script into the container
+    defacer.py /defacer.py
+
+%environment
+    # Set environment variables
+    export MKL_SERVICE_FORCE_INTEL=1
+    export TZ=US/Eastern
+
+%runscript
+    # Default command when the container is executed
+    exec python /defacer.py "$@"
