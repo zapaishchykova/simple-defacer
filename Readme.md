@@ -27,7 +27,7 @@ If you intend to leverage GPU acceleration for faster processing, ensure the fol
 The project directory as follows:
 
 ```
-brain_extraction_project/
+simple-defacer/
 │
 ├── Dockerfile
 ├── defacer.py
@@ -51,7 +51,7 @@ brain_extraction_project/
 Navigate to your project directory and build the Docker image using the provided `Dockerfile`.
 
 ```bash
-cd path/to/brain_extraction_project
+cd path/to/simple-defacer
 docker build -t brain-extraction:latest .
 ```
 
@@ -101,8 +101,8 @@ docker run \
 
 ```bash
 docker run --gpus all \
-    -v /home/user/brain_extraction_project/input_nifti:/input \
-    -v /home/user/brain_extraction_project/output:/output \
+    -v /home/user/simple-defacer/input_nifti:/input \
+    -v /home/user/simple-defacer/output:/output \
     brain-extraction:latest \
     --input_dir /input \
     --output_path /output \
@@ -127,7 +127,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-**Note**: Replace placeholder paths (e.g., `/home/user/brain_extraction_project/`) with actual paths relevant to your environment. Ensure that all dependencies and scripts are correctly referenced and that directory permissions are appropriately set to allow Docker to access necessary files.
+**Note**: Replace placeholder paths (e.g., `/home/user/simple-defacer/`) with actual paths relevant to your environment. Ensure that all dependencies and scripts are correctly referenced and that directory permissions are appropriately set to allow Docker to access necessary files.
 
 For any further assistance or questions, feel free to open an issue or contact the maintainer.
 
