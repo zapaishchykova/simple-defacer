@@ -1,23 +1,6 @@
-```markdown
-# Brain Extraction Pipeline with Docker
+# Brain Extraction Pipeline with HDBET (Docker and Signgularity)
 
-This project provides a streamlined pipeline for **brain extraction** from NIfTI (`.nii.gz`) files using **HDBET** within a Dockerized environment. Leveraging Docker ensures a consistent and reproducible setup, simplifying the deployment and execution process across different systems.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Prerequisites](#prerequisites)
-- [Project Structure](#project-structure)
-- [Building the Docker Image](#building-the-docker-image)
-- [Running the Docker Container](#running-the-docker-container)
-  - [With GPU Support](#with-gpu-support)
-  - [Without GPU Support](#without-gpu-support)
-- [Example Usage](#example-usage)
-- [License](#license)
-
-## Overview
-
-This pipeline automates the process of skull stripping and brain extraction from neuroimaging data. It utilizes **HDBET** for accurate brain extraction and processes multiple NIfTI files in batches. The entire setup is encapsulated within a Docker container to ensure environment consistency and ease of deployment.
+This project provides a simple docker/singularity pipeline for **defacing** from NIfTI MRI (`.nii.gz`) files using skull-stripping **HD-BET** and then dilation. 
 
 ## Prerequisites
 
@@ -26,11 +9,11 @@ Before setting up and running the pipeline, ensure that your system meets the fo
 ### 0. Download the HDBET Repository
 Link: https://github.com/MIC-DKFZ/HD-BET
 
-### 1. Docker
+### 1. Docker Or Singularity
 
-- **Installation**: Docker must be installed and running on your system. Follow the [official Docker installation guide](https://docs.docker.com/get-docker/) for your operating system.
+- **Installation**: Docker must be installed and running on your system. Follow the [official Docker installation guide](https://docs.docker.com/get-docker/) for your operating system. Follow the [official Singularity installation guide](https://sylabs.io/guides/3.7/user-guide/installation.html) for your operating system.
 
-### 2. NVIDIA Docker (Optional for GPU Support)
+**(Optional for GPU Support)**
 
 If you intend to leverage GPU acceleration for faster processing, ensure the following:
 
@@ -41,7 +24,7 @@ If you intend to leverage GPU acceleration for faster processing, ensure the fol
 
 ## Project Structure
 
-Organize your project directory as follows:
+The project directory as follows:
 
 ```
 brain_extraction_project/
@@ -60,9 +43,6 @@ brain_extraction_project/
 └── output/  # Optional; the script can create it
 ```
 
-- **Dockerfile**: Defines the Docker image configuration.
-- **defacer.py**: Your main Python script for brain extraction.
-- **HDBET/**: Directory containing the HDBET tool and its dependencies.
 - **input_nifti/**: Directory containing input NIfTI files.
 - **output/**: Directory where the processed brain-extracted NIfTI files will be saved.
 
@@ -75,28 +55,9 @@ cd path/to/brain_extraction_project
 docker build -t brain-extraction:latest .
 ```
 
-**Explanation**:
-
-- `docker build`: Command to build a Docker image.
-- `-t brain-extraction:latest`: Tags the image with the name `brain-extraction` and the tag `latest`.
-- `.`: Specifies the current directory as the build context.
-
-**Expected Output**:
-
-The build process will execute each step in the `Dockerfile`. It may take several minutes, especially when installing dependencies. Upon successful completion, you'll see a message indicating that the image has been built.
-
-```
-Step 1/...
-...
-Successfully built abcdef123456
-Successfully tagged brain-extraction:latest
-```
-
-## Running the Docker Container
-
 Once the image is built, you can run the container to execute your Python script. Depending on whether you have GPU support, follow the appropriate instructions below.
 
-### With GPU Support
+### With GPU Support (NVIDIA Docker)
 
 If you have an NVIDIA GPU and NVIDIA Docker installed, run the container with GPU access:
 
@@ -120,7 +81,7 @@ docker run --gpus all \
 - `--output_path /output`: Argument specifying the output directory inside the container.
 - `--CUDA_VISIBLE_DEVICES 0`: Sets the CUDA device ID to use.
 
-### Without GPU Support
+### Without GPU Support (Docker)
 
 If you don't have a GPU or prefer to run the container without GPU acceleration:
 
@@ -136,22 +97,7 @@ docker run \
 
 **Note**: Setting `--CUDA_VISIBLE_DEVICES` to `-1` typically indicates that no GPU should be used.
 
-## Example Usage
-
-Assuming the following:
-
-- **Project Directory**: `/home/user/brain_extraction_project/`
-- **Input Directory**: `/home/user/brain_extraction_project/input_nifti/`
-- **Output Directory**: `/home/user/brain_extraction_project/output/`
-
-### Building the Image
-
-```bash
-cd /home/user/brain_extraction_project/
-docker build -t brain-extraction:latest .
-```
-
-### Running the Container with GPU
+### Running the Container with GPU (Docker)
 
 ```bash
 docker run --gpus all \
@@ -162,46 +108,18 @@ docker run --gpus all \
     --output_path /output \
     --CUDA_VISIBLE_DEVICES 0
 ```
+## Singularity (using defacer.def)
+Note: this is not tested, if you do, please let me know if it works or not :) 
 
-### Running the Container Without GPU
-
-```bash
-docker run \
-    -v /home/user/brain_extraction_project/input_nifti:/input \
-    -v /home/user/brain_extraction_project/output:/output \
-    brain-extraction:latest \
-    --input_dir /input \
-    --output_path /output \
-    --CUDA_VISIBLE_DEVICES -1
+To build the Singularity image and run the container, execute the following commands:
 ```
-
-
-### Interactive Debugging
-
-For interactive debugging, run the container with an interactive shell:
-
-```bash
-docker run --gpus all -it \
-    -v /home/user/brain_extraction_project/input_nifti:/input \
-    -v /home/user/brain_extraction_project/output:/output \
-    brain-extraction:latest \
-    /bin/bash
+sudo singularity build defacer.sif Singularity.def
+singularity run defacer.sif
 ```
-
-Once inside the container, manually execute your Python script or inspect the filesystem:
-
-```bash
-python /defacer.py --input_dir /input --output_path /output --CUDA_VISIBLE_DEVICES 0
+OR if you want to pass the input and output directories as arguments:
 ```
-
-docker run --gpus all \
-    -v /media/sdb/Anna/defacer/input_nifti:/input \
-    -v /media/sdb/Anna/defacer/output:/output \
-    brain-extraction \
-    --input_dir /input \
-    --output_path /output \
-    --CUDA_VISIBLE_DEVICES 0
-
+singularity run defacer.sif --input /path/to/input --output /path/to/output
+```
 
 ## License
 
