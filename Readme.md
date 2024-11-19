@@ -131,3 +131,6 @@ This project is licensed under the [MIT License](LICENSE).
 
 For any further assistance or questions, feel free to open an issue or contact the maintainer.
 
+## Acknowledgments
+Demo data taken from:
+The example data was obtained from the 1: [OpenfMRI dataset](https://openfmri.org/dataset/ds000228/), its accession number is ds000228 and 2: [Calgary dataset](https://osf.io/axz5r/files/osfstorage).
