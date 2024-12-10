@@ -51,7 +51,11 @@ def main():
 
     input_dir = args.input_dir
     output_path = args.output_path
-    cuda_visible_devices = args.CUDA_VISIBLE_DEVICES
+    #check if CUDA_VISIBLE_DEVICES is set to -1, if so, set it to None
+    if args.CUDA_VISIBLE_DEVICES == -1:
+        cuda_visible_devices = 'cpu'
+    else:
+        cuda_visible_devices = args.CUDA_VISIBLE_DEVICES
 
     proj_dir = './'
 
@@ -76,6 +80,7 @@ def main():
         mask_path = os.path.join(temp_path, f"{base_filename}_skull_strip_mask.nii.gz")
 
         # 2. Perform skull stripping using HDBET and save intermediate files to temp
+        #if cude_visible_devices is None, set it to None
         run_hd_bet(
             img_path,
             skull_stripped_path,
